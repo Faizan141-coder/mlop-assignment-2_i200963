@@ -6,6 +6,10 @@ from datetime import datetime
 import os
 import json
 import re
+from datetime import datetime, timedelta
+
+# Define the start date for the DAG
+start_date = datetime(2022, 1, 1)
 
 sources = ['https://www.dawn.com/', 'https://www.bbc.com/']
 
@@ -58,14 +62,15 @@ def load(data):
     os.system("git add . && git commit -m 'Added new data version' && git push origin master")
 
 default_args = {
-    'owner': 'airflow-demo'
+    'owner': 'airflow-demo',
+    'start_date': start_date
 }
 
 dag = DAG(
     'mlops-dag',
     default_args=default_args,
     description='A simple ',
-    schedule_interval='@daily'  # You can adjust the schedule as needed
+    schedule=timedelta(days=1)
 )
 
 task1 = PythonOperator(
@@ -83,7 +88,6 @@ task2 = PythonOperator(
 task3 = PythonOperator(
     task_id="Task_3",
     python_callable=load,
-    provide_context=True,
     dag=dag
 )
 
